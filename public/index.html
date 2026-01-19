@@ -26,12 +26,26 @@
           <div class="upload-options">
             <label class="upload-btn">
               <input type="file" id="video-file" accept="video/*" hidden>
-              📁 Upload Video from Device
+              📁 Upload Small Video (&lt;100MB)
             </label>
             <div class="divider">OR</div>
-            <input type="text" id="video-url" placeholder="Enter video URL (MP4 link)">
+            <input type="text" id="video-url" placeholder="Paste video URL (Google Drive, Dropbox, direct MP4 link)">
+            <p class="hint-small">💡 For movies &gt;100MB, upload to Google Drive/Dropbox and paste the direct link here</p>
           </div>
           <button id="create-room-btn" class="primary-btn">Create Room & Get QR Code</button>
+          
+          <div class="help-section">
+            <details>
+              <summary>How to get video URL from Google Drive?</summary>
+              <ol>
+                <li>Upload video to Google Drive</li>
+                <li>Right-click → Get link → Change to "Anyone with the link"</li>
+                <li>Copy the link (looks like: drive.google.com/file/d/XXXXX/view)</li>
+                <li>Convert it to direct link: drive.google.com/uc?export=download&id=XXXXX</li>
+                <li>Paste here!</li>
+              </ol>
+            </details>
+          </div>
         </div>
 
         <div id="join-tab" class="tab-content">

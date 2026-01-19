@@ -214,6 +214,38 @@ header p {
   font-size: 24px;
 }
 
+.hint-small {
+  font-size: 13px;
+  color: #666;
+  margin-top: 10px;
+  line-height: 1.4;
+}
+
+.help-section {
+  margin-top: 20px;
+  padding: 15px;
+  background: #f8f9fa;
+  border-radius: 10px;
+}
+
+.help-section details {
+  cursor: pointer;
+}
+
+.help-section summary {
+  font-weight: 600;
+  color: #667eea;
+  padding: 5px;
+}
+
+.help-section ol {
+  margin-top: 10px;
+  margin-left: 20px;
+  font-size: 13px;
+  color: #666;
+  line-height: 1.6;
+}
+
 .video-container {
   position: relative;
   background: black;
