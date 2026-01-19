@@ -51,9 +51,41 @@ You need a direct link to an MP4 video file. You can:
 
 Example URL: https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4
 
-## Tech Stack
+## Deployment
 
-- Node.js + Express
-- Socket.io (real-time sync)
-- WebRTC (video chat)
-- Vanilla JavaScript
+### Deploy to Vercel
+
+**Note:** Vercel's free tier has limitations with WebSocket connections (Socket.io). For production use, consider deploying to:
+- Heroku
+- Railway
+- Render
+- DigitalOcean
+
+If you still want to try Vercel:
+
+1. Install Vercel CLI:
+```bash
+npm install -g vercel
+```
+
+2. Deploy:
+```bash
+vercel
+```
+
+### Deploy to Railway (Recommended)
+
+1. Go to https://railway.app
+2. Click "New Project" → "Deploy from GitHub repo"
+3. Select your `watch-together` repository
+4. Railway will auto-detect and deploy
+5. Your app will be live with full WebSocket support!
+
+### Deploy to Render
+
+1. Go to https://render.com
+2. Click "New +" → "Web Service"
+3. Connect your GitHub repository
+4. Build Command: `npm install`
+5. Start Command: `npm start`
+6. Click "Create Web Service"
