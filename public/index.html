@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Watch Together - Movie Night for Couples</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>💕 Watch Together</h1>
+      <p>Share movie moments with your loved one</p>
+    </header>
+
+    <div id="setup-screen" class="screen active">
+      <div class="setup-card">
+        <h2>Start Your Movie Night</h2>
+        
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="host">Host Movie</button>
+          <button class="tab-btn" data-tab="join">Join with QR</button>
+        </div>
+
+        <div id="host-tab" class="tab-content active">
+          <div class="upload-options">
+            <label class="upload-btn">
+              <input type="file" id="video-file" accept="video/*" hidden>
+              📁 Upload Video from Device
+            </label>
+            <div class="divider">OR</div>
+            <input type="text" id="video-url" placeholder="Enter video URL (MP4 link)">
+          </div>
+          <button id="create-room-btn" class="primary-btn">Create Room & Get QR Code</button>
+        </div>
+
+        <div id="join-tab" class="tab-content">
+          <p class="hint">Scan your partner's QR code or enter room code</p>
+          <input type="text" id="room-code-input" placeholder="Enter room code">
+          <button id="join-room-btn" class="primary-btn">Join Room</button>
+        </div>
+      </div>
+
+      <div id="qr-modal" class="modal">
+        <div class="modal-content">
+          <h2>Share this QR Code 💕</h2>
+          <div id="qr-code"></div>
+          <p class="room-code-display">Room Code: <strong id="display-room-code"></strong></p>
+          <p class="hint">Your partner can scan this or enter the room code</p>
+          <button id="start-watching-btn" class="primary-btn">Start Watching</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="watch-screen" class="screen">
+      <div class="video-container">
+        <video id="video-player" controls></video>
+        <div class="video-chat">
+          <video id="remote-video" autoplay playsinline></video>
+          <video id="local-video" autoplay playsinline muted></video>
+        </div>
+      </div>
+      
+      <div class="controls">
+        <div class="room-info">
+          <span>Room: <strong id="current-room"></strong></span>
+          <span id="connection-status">Connecting...</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
