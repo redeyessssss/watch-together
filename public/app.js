@@ -40,11 +40,21 @@ const iceServers = {
 };
 
 // Handle video file upload
-videoFileInput.addEventListener('change', (e) => {
+videoFileInput.addEventListener('change', async (e) => {
   const file = e.target.files[0];
   if (file) {
-    videoSource = URL.createObjectURL(file);
-    console.log('File selected:', file.name, file.type);
+    console.log('File selected:', file.name, file.type, 'Size:', (file.size / 1024 / 1024).toFixed(2) + ' MB');
+    
+    // Show file size warning if over 1GB
+    if (file.size > 1024 * 1024 * 1024) {
+      const sizeGB = (file.size / 1024 / 1024 / 1024).toFixed(2);
+      if (!confirm(`This file is ${sizeGB} GB. Upload may take several minutes. Continue?`)) {
+        videoFileInput.value = '';
+        return;
+      }
+    }
+    
+    videoSource = file;
   }
 });
 
@@ -119,22 +129,37 @@ async function startWatching() {
   
   await initializeMedia();
   
-  // If host with uploaded file, convert to base64 and send
-  if (isInitiator && videoSource && videoSource.startsWith('blob:')) {
-    const file = videoFileInput.files[0];
-    if (file) {
-      connectionStatus.textContent = 'Uploading video...';
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const videoData = e.target.result;
-        videoPlayer.src = videoData;
-        console.log('Host: Video loaded from file, joining room with video data');
-        socket.emit('join-room', { roomId, videoData });
+  // If host with uploaded file, upload to server first
+  if (isInitiator && videoSource && videoSource instanceof File) {
+    connectionStatus.textContent = 'Uploading video to server...';
+    
+    const formData = new FormData();
+    formData.append('video', videoSource);
+    
+    try {
+      const response = await fetch('/upload-video', {
+        method: 'POST',
+        body: formData
+      });
+      
+      const data = await response.json();
+      
+      if (data.success) {
+        const videoUrl = window.location.origin + data.videoUrl;
+        videoPlayer.src = videoUrl;
+        console.log('Host: Video uploaded to server:', videoUrl);
+        socket.emit('join-room', { roomId, videoUrl });
         connectionStatus.textContent = 'Waiting for partner...';
-      };
-      reader.readAsDataURL(file);
-      return; // Don't join room yet, wait for file to load
+      } else {
+        connectionStatus.textContent = 'Upload failed!';
+        alert('Failed to upload video: ' + (data.error || 'Unknown error'));
+      }
+    } catch (error) {
+      console.error('Upload error:', error);
+      connectionStatus.textContent = 'Upload failed!';
+      alert('Failed to upload video. Please try again or use a video URL instead.');
     }
+    return;
   } else if (isInitiator && videoSource) {
     // URL-based video
     videoPlayer.src = videoSource;
@@ -255,23 +280,17 @@ socket.on('webrtc-ice-candidate', async (data) => {
 
 socket.on('room-state', (state) => {
   console.log('🎬 Received room state:', {
-    hasVideoData: !!state.videoData,
     hasVideoUrl: !!state.videoUrl,
-    videoDataLength: state.videoData ? state.videoData.length : 0,
     playing: state.playing,
     currentTime: state.currentTime
   });
   
   // Set video source if provided
-  if (state.videoData && !videoPlayer.src) {
-    console.log('✅ Loading video from data (uploaded file)');
-    videoPlayer.src = state.videoData;
-    connectionStatus.textContent = 'Video loaded from partner';
-  } else if (state.videoUrl && !videoPlayer.src) {
+  if (state.videoUrl && !videoPlayer.src) {
     console.log('✅ Loading video from URL:', state.videoUrl);
     videoPlayer.src = state.videoUrl;
     connectionStatus.textContent = 'Video loaded from URL';
-  } else if (!state.videoData && !state.videoUrl) {
+  } else if (!state.videoUrl) {
     console.log('⚠️ No video in room state yet - waiting for host to upload');
   }
   
@@ -301,11 +320,7 @@ socket.on('room-state', (state) => {
 // Listen for video becoming available after joining
 socket.on('video-available', (data) => {
   console.log('🎉 Video now available from host!');
-  if (data.videoData && !videoPlayer.src) {
-    console.log('✅ Loading video from data');
-    videoPlayer.src = data.videoData;
-    connectionStatus.textContent = 'Video loaded from partner';
-  } else if (data.videoUrl && !videoPlayer.src) {
+  if (data.videoUrl && !videoPlayer.src) {
     console.log('✅ Loading video from URL:', data.videoUrl);
     videoPlayer.src = data.videoUrl;
     connectionStatus.textContent = 'Video loaded from URL';
